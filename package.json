@@ -1,0 +1,42 @@
+{
+	"name": "postgress",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"devStart": "nodemon --exec ts-node src/server.ts",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@emotion/react": "^11.11.4",
+		"@emotion/styled": "^11.11.5",
+		"@mui/material": "^5.15.15",
+		"bcryptjs": "^2.4.3",
+		"dotenv": "^16.4.5",
+		"express": "^4.19.2",
+		"express-rate-limit": "^7.2.0",
+		"joi": "^17.13.0",
+		"jsonwebtoken": "^9.0.2",
+		"next": "^14.2.3",
+		"pg": "^8.11.5",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"devDependencies": {
+		"@types/bcryptjs": "^2.4.6",
+		"@types/express": "^4.17.21",
+		"@types/express-rate-limit": "^6.0.0",
+		"@types/jsonwebtoken": "^9.0.6",
+		"@types/node": "^20.12.7",
+		"@types/pg": "^8.11.5",
+		"nodemon": "^3.1.0",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.4.5"
+	}
+}
