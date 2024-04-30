@@ -5,7 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 const Navbar: React.FC = () => {
 
-    const navItems = ['Home', 'About', 'Contact', 'Login', 'Register', 'Withdraw'];
+    const navItems = ['Home', 'Login', 'Register', 'Withdraw'];
 
     return (
         <AppBar component="nav">
@@ -22,15 +22,17 @@ const Navbar: React.FC = () => {
                 <Typography
                     variant="h6"
                     component="div"
-                    sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                    sx={{ flexGrow: 1, display: { xs: 'block', sm: 'block' } }}
                 >
                     MUI
                 </Typography>
                 <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                     {navItems.map((item) => (
-                        <Button key={item} sx={{ color: '#fff' }}>
-                            {item}
-                        </Button>
+                        <Link href={`/${item.toLowerCase()}`} key={item}>
+                            <Button sx={{ color: '#fff' }}>
+                                {item}
+                            </Button>
+                        </Link>
                     ))}
                 </Box>
                 <Box sx={{ display: { xs: 'none', sm: 'block' } }}>

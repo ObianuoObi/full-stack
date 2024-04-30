@@ -1,29 +1,17 @@
-import { Button } from '@mui/material';
-import Link from 'next/link';
+import { Box } from '@mui/system';
 import React from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const Home: React.FC = () => {
-
-
-
     return (
-        <div>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Navbar />
-            <h1>Welcome to Our Bank</h1>
-            <p>Please select an option:</p>
-            <Link href="/register">
-                <Button variant="contained" color="primary">
-                    Register
-                </Button>
-            </Link>
-            <Link href="/login">
-                <Button variant="contained" color="primary">
-                    Login
-                </Button>
-            </Link>
-
-        </div>
+            <Box sx={{ flexGrow: 1 }}>
+                {/* Your main content goes here */}
+            </Box>
+            <Footer />
+        </Box>
     );
 }
 
