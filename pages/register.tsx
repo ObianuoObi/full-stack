@@ -16,7 +16,16 @@ const Register: React.FC = () => {
     };
 
     return (
-        <Container>
+        <Container
+            maxWidth="xl"
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
+                minHeight: 'calc(100vh - 100px)',
+                mt: 12,
+            }}
+        >
             <Navbar />
             <Box
                 display="flex"

@@ -40,7 +40,7 @@ const Navbar: React.FC = () => {
                 >
                     MUI
                 </Typography>
-                <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <Box sx={{ display: { xs: 'none', sm: 'block', } }}>
                     {navItems.map((item) => (
                         <Link href={`/${item.name.toLowerCase()}`} key={item.name}>
                             <Button sx={{ color: '#fff' }}>
@@ -58,22 +58,12 @@ const Navbar: React.FC = () => {
                         {navItems.map((item, index) => (
                             <Link href={`/${item.name.toLowerCase()}`} key={item.name} passHref>
                                 <ListItem
-                                    disableGutters
-                                    component="a"
-                                    sx={{
-                                        textDecoration: 'none',
-                                        '&:hover': {
-                                            textDecoration: 'none',
-                                        },
-                                    }}
-                                >
+                                    disableGutters>
+
                                     <ListItemButton
                                         disableRipple
-                                        sx={{
+                                        style={{
                                             textDecoration: 'none',
-                                            '&:hover': {
-                                                textDecoration: 'none',
-                                            },
                                         }}
                                     >
                                         {drawerOpen && <ListItemIcon>{item.icon}</ListItemIcon>}
