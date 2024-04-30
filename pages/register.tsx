@@ -34,14 +34,23 @@ const Register: React.FC = () => {
                 justifyContent="center"
                 style={{ minHeight: '100vh' }}
             >
-                <Typography variant="h4" component="h1" gutterBottom>
+                <Typography
+                    variant="h4"
+                    component="h1"
+                    gutterBottom
+                    sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' } }} // smaller font size on small screens
+                >
                     Create Account
                 </Typography>
                 <Box
                     component="form"
                     sx={{
-                        '& .MuiTextField-root': { m: 1, width: '50ch' },
+                        '& .MuiTextField-root': {
+                            m: 1,
+                            width: { xs: '90%', sm: '50ch' } // 90% width on small screens, 50ch on larger screens
+                        },
                     }}
+
                     noValidate
                     autoComplete="off"
                 >
@@ -71,7 +80,7 @@ const Register: React.FC = () => {
                         />
                     </Box>
                     <Box>
-                        <FormControl sx={{ m: 1, width: '50ch' }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: { xs: '90%', sm: '50ch' } }} variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"
@@ -93,7 +102,7 @@ const Register: React.FC = () => {
                         </FormControl>
                     </Box>
                     <Box>
-                        <FormControl sx={{ m: 1, width: '50ch' }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: { xs: '90%', sm: '50ch' } }} variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-confirm-password">Confirm Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-confirm-password"
@@ -115,7 +124,12 @@ const Register: React.FC = () => {
                         </FormControl>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
-                        <Button variant="contained" color="primary" type="submit">
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            type="submit"
+                            sx={{ padding: { xs: '6px 16px', sm: '9px 22px' } }} // smaller padding on small screens
+                        >
                             Register
                         </Button>
                     </Box>
