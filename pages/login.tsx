@@ -13,7 +13,16 @@ const Login: React.FC = () => {
     };
 
     return (
-        <Container>
+        <Container
+            maxWidth="xl"
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
+                minHeight: 'calc(100vh - 100px)',
+                mt: 12,
+            }}
+        >
             <Navbar />
             <Box
                 display="flex"
@@ -22,13 +31,13 @@ const Login: React.FC = () => {
                 justifyContent="center"
                 style={{ minHeight: '100vh' }}
             >
-                <Typography variant="h4" component="h1" gutterBottom>
+                <Typography variant="h4" component="h1" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' } }} >
                     Login
                 </Typography>
                 <Box
                     component="form"
                     sx={{
-                        '& .MuiTextField-root': { m: 1, width: '50ch' },
+                        '& .MuiTextField-root': { m: 1, width: { xs: '100%', sm: '50ch' } },
                     }}
                     noValidate
                     autoComplete="off"
@@ -43,7 +52,7 @@ const Login: React.FC = () => {
                         />
                     </Box>
                     <Box>
-                        <FormControl sx={{ m: 1, width: '50ch' }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: { xs: '100%', sm: '50ch' } }} variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"
@@ -65,7 +74,7 @@ const Login: React.FC = () => {
                         </FormControl>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
-                        <Button variant="contained" color="primary" type="submit">
+                        <Button variant="contained" color="primary" type="submit" sx={{ padding: { xs: '6px 16px', sm: '9px 22px' } }}>
                             Sign In
                         </Button>
                     </Box>
