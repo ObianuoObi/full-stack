@@ -1,19 +1,16 @@
 import { AppBar, Toolbar, IconButton, Typography, Box, Button, Drawer, List, ListItem, ListItemIcon, ListItemButton } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import LoginIcon from '@mui/icons-material/Login';
-import RegisterIcon from '@mui/icons-material/PersonAdd';
-import WithdrawIcon from '@mui/icons-material/MoneyOff';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Divider } from '@mui/material';
 
 const Navbar: React.FC = () => {
 
     const navItems = [
-        { name: 'Home', icon: <HomeIcon /> },
-        { name: 'Login', icon: <LoginIcon /> },
-        { name: 'Register', icon: <RegisterIcon /> },
-        { name: 'Withdraw', icon: <WithdrawIcon /> },
+        { name: 'Home' },
+        { name: 'Login', },
+        { name: 'Register', },
+        { name: 'Withdraw', },
     ];
     const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -50,21 +47,22 @@ const Navbar: React.FC = () => {
                     ))}
                 </Box>
                 <Drawer
-                    anchor="right"
+                    anchor="left"
                     open={drawerOpen}
                     onClose={handleDrawerToggle}
-
                 >
-                    <List >
+                    <List>
                         {navItems.map((item, index) => (
-                            <Link href={`/${item.name.toLowerCase()}`} key={item.name}>
-                                <ListItem disableGutters >
-                                    <ListItemButton disableRipple >
-                                        {drawerOpen && <ListItemIcon>{item.icon}</ListItemIcon>}
-                                        <Typography>{item.name}</Typography>
-                                    </ListItemButton>
-                                </ListItem>
-                            </Link>
+                            <React.Fragment key={item.name}>
+                                <Link href={`/${item.name.toLowerCase()}`} style={{ textDecoration: 'none' }}>
+                                    <ListItem disableGutters>
+                                        <ListItemButton disableRipple sx={{ py: 0.5 }}> {/* Reduce vertical padding */}
+                                            <Typography>{item.name}</Typography>
+                                        </ListItemButton>
+                                    </ListItem>
+                                </Link>
+                                {index < navItems.length - 0 && <Divider component="li" />} {/* Add Divider */}
+                            </React.Fragment>
                         ))}
                     </List>
                 </Drawer>
