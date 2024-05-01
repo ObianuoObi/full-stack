@@ -37,7 +37,7 @@ const Login: React.FC = () => {
                 <Box
                     component="form"
                     sx={{
-                        '& .MuiTextField-root': { m: 1, width: { xs: '90%', sm: '50ch' } },
+                        '& .MuiTextField-root': { m: 1, width: { xs: '100%', sm: '50ch' } },
                     }}
                     noValidate
                     autoComplete="off"
@@ -52,7 +52,7 @@ const Login: React.FC = () => {
                         />
                     </Box>
                     <Box>
-                        <FormControl sx={{ m: 1, width: { xs: '90%', sm: '50ch' } }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: { xs: '100%', sm: '50ch' } }} variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"

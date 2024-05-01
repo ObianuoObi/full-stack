@@ -50,22 +50,16 @@ const Navbar: React.FC = () => {
                     ))}
                 </Box>
                 <Drawer
-                    anchor="left"
+                    anchor="right"
                     open={drawerOpen}
                     onClose={handleDrawerToggle}
-                >
-                    <List>
-                        {navItems.map((item, index) => (
-                            <Link href={`/${item.name.toLowerCase()}`} key={item.name} passHref>
-                                <ListItem
-                                    disableGutters>
 
-                                    <ListItemButton
-                                        disableRipple
-                                        style={{
-                                            textDecoration: 'none',
-                                        }}
-                                    >
+                >
+                    <List >
+                        {navItems.map((item, index) => (
+                            <Link href={`/${item.name.toLowerCase()}`} key={item.name}>
+                                <ListItem disableGutters >
+                                    <ListItemButton disableRipple >
                                         {drawerOpen && <ListItemIcon>{item.icon}</ListItemIcon>}
                                         <Typography>{item.name}</Typography>
                                     </ListItemButton>
@@ -75,7 +69,7 @@ const Navbar: React.FC = () => {
                     </List>
                 </Drawer>
             </Toolbar>
-        </AppBar>
+        </AppBar >
     );
 }
 
