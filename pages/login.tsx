@@ -19,8 +19,9 @@ const Login: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 flexGrow: 1,
-                minHeight: 'calc(100vh - 100px)',
-                mt: 12,
+                height: '100vh', // Set height to '100vh'
+                mt: { xs: 0, sm: 12 }, // Remove top margin on extra-small screens
+                overflow: 'hidden',
             }}
         >
             <Navbar />
@@ -29,7 +30,7 @@ const Login: React.FC = () => {
                 flexDirection="column"
                 alignItems="center"
                 justifyContent="center"
-                style={{ minHeight: '100vh' }}
+                style={{ minHeight: '100%' }}
             >
                 <Typography variant="h4" component="h1" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' } }} >
                     Login

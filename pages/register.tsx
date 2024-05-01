@@ -22,8 +22,9 @@ const Register: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 flexGrow: 1,
-                minHeight: 'calc(100vh - 100px)',
-                mt: 12,
+                height: '100vh',
+                mt: { xs: 0, sm: 12 }, // Remove top margin on extra-small screens
+                overflow: 'hidden',
             }}
         >
             <Navbar />
@@ -32,7 +33,7 @@ const Register: React.FC = () => {
                 flexDirection="column"
                 alignItems="center"
                 justifyContent="center"
-                style={{ minHeight: '100vh' }}
+                style={{ minHeight: '100%' }}
             >
                 <Typography
                     variant="h4"
