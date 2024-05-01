@@ -47,7 +47,7 @@ const Register: React.FC = () => {
                     sx={{
                         '& .MuiTextField-root': {
                             m: 1,
-                            width: { xs: '120%', sm: '50ch' } // 90% width on small screens, 50ch on larger screens
+                            width: { xs: '90%', sm: '50ch' } // 90% width on small screens, 50ch on larger screens
                         },
                     }}
 
@@ -80,7 +80,7 @@ const Register: React.FC = () => {
                         />
                     </Box>
                     <Box>
-                        <FormControl sx={{ m: 1, width: { xs: '120%', sm: '50ch' } }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: { xs: '90%', sm: '50ch' } }} variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"
@@ -102,7 +102,7 @@ const Register: React.FC = () => {
                         </FormControl>
                     </Box>
                     <Box>
-                        <FormControl sx={{ m: 1, width: { xs: '100%', sm: '50ch' } }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: { xs: '90%', sm: '50ch' } }} variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-confirm-password">Confirm Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-confirm-password"
@@ -135,7 +135,7 @@ const Register: React.FC = () => {
                     </Box>
                 </Box>
             </Box>
-        </Container>
+        </Container >
     );
 }
 
