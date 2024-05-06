@@ -12,7 +12,7 @@ const pool = new Pool({
 export const getUsers = async () => {
 	try {
 		const result = await pool.query(
-			"SELECT id, username, balance, referral_link, email, full_name FROM user_details;"
+			"SELECT id, first_name, last_name, balance, referral_link, phone_number, FROM user_details;"
 		)
 		return result.rows
 	} catch (error) {
@@ -33,12 +33,11 @@ export const getUser = async (userId: string) => {
 		throw error
 	}
 }
-
-export const getUserByUsername = async (username: string) => {
+export const getUserByPhoneNumber = async (phone_number: string) => {
 	try {
 		const result = await pool.query(
-			"SELECT * FROM user_details WHERE username = $1",
-			[username]
+			"SELECT * FROM user_details WHERE phone_number = $1",
+			[phone_number]
 		)
 		return result.rows[0]
 	} catch (error) {
@@ -110,11 +109,37 @@ export const createPairing = async (userId: string, adminId: string) => {
 export const saveUserToDatabase = async (user: User) => {
 	try {
 		await pool.query(
-			"INSERT INTO user_details(username, email, password) VALUES($1, $2, $3)",
-			[user.username, user.email, user.password]
+			"INSERT INTO user_details(first_name, last_name, phone_number, password) VALUES($1, $2, $3, $4)",
+			[user.first_name, user.last_name, user.phone_number, user.password]
 		)
 	} catch (error) {
 		console.error(error)
 		throw error
 	}
+}
+
+export const updateUserDetails = async (
+	first_name: string,
+	last_name: string,
+	account_number: string,
+	phone_number: string
+) => {
+	await pool.query(
+		"UPDATE user_details SET first_name = $1, last_name = $2, account_number = $3 WHERE phone_number = $4",
+		[first_name, last_name, account_number, phone_number]
+	)
+}
+
+export const depositMoney = async (deposit: number, phone_number: string) => {
+	await pool.query(
+		"UPDATE user_details SET balance = balance + $1 WHERE phone_number = $2",
+		[deposit, phone_number]
+	)
+}
+
+export const withdrawMoney = async (withdraw: number, phone_number: string) => {
+	await pool.query(
+		"UPDATE user_details SET balance = balance - $1 WHERE phone_number = $2",
+		[withdraw, phone_number]
+	)
 }

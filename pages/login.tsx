@@ -1,16 +1,41 @@
 import { Box, Button, Container, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Navbar from '../components/Navbar';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import axios from 'axios';
 
 const Login: React.FC = () => {
+    const [showPassword, setShowPassword] = useState(false);
+    const [phone_number, setPhoneNumber] = useState('');
+    const [password, setPassword] = useState('');
+    const router = useRouter();
 
-    const [showPassword, setShowPassword] = React.useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
+
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
     };
+
+    const handleLogin = async (event: React.FormEvent) => {
+        event.preventDefault();
+        try {
+            const response = await axios.post('http://localhost:3002/login', {
+                phone_number: phone_number,
+                password: password,
+            });
+            console.log(response);
+            // Save the returned token for future authenticated requests
+            localStorage.setItem('token', response.data.accessToken);
+            router.push('/dashboard');
+        } catch (error) {
+            console.error(error);
+            // Handle login error
+        }
+    };
+
 
     return (
         <Container
@@ -19,9 +44,8 @@ const Login: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 flexGrow: 1,
-                height: '100vh', // Set height to '100vh'
-                mt: { xs: 0, sm: 12 }, // Remove top margin on extra-small screens
-                overflow: 'hidden',
+                height: '100vh',
+                mt: { xs: 0, sm: 12 },
             }}
         >
             <Navbar />
@@ -37,6 +61,7 @@ const Login: React.FC = () => {
                 </Typography>
                 <Box
                     component="form"
+                    onSubmit={handleLogin}
                     sx={{
                         '& .MuiTextField-root': { m: 1, width: { xs: '100%', sm: '50ch' } },
                     }}
@@ -47,17 +72,21 @@ const Login: React.FC = () => {
                         <TextField
                             variant="outlined"
                             required
-                            id="filled-required-email"
-                            label="Email"
-                            type="email"
+                            id="filled-required-phone-number"
+                            label="Phone Number"
+                            type="tel"
+                            value={phone_number}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
                         />
                     </Box>
                     <Box>
-                        <FormControl sx={{ m: 1, width: { xs: '100%', sm: '50ch' } }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: { xs: '100%', sm: '50ch' } }} required variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"
                                 type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 endAdornment={
                                     <InputAdornment position="end">
                                         <IconButton
@@ -73,6 +102,10 @@ const Login: React.FC = () => {
                                 label="Password"
                             />
                         </FormControl>
+
+                    </Box>
+                    <Box sx={{ ml: 1 }}>
+                        <Link href="/register" style={{ textDecoration: 'none', color: 'black', fontFamily: 'Helvetica' }}>Don't have an account? click here</Link>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
                         <Button variant="contained" color="primary" type="submit" sx={{ padding: { xs: '6px 16px', sm: '9px 22px' } }}>

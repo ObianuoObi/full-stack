@@ -1,12 +1,18 @@
 import { Box, Button, Container, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Navbar from '../components/Navbar';
+import axios from 'axios';
 
 const Register: React.FC = () => {
     const [showPassword, setShowPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
@@ -14,6 +20,32 @@ const Register: React.FC = () => {
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
     };
+
+    const handleRegister = async (event: React.FormEvent) => {
+        event.preventDefault();
+        try {
+            const response = await axios.post('http://localhost:3002/register', {
+                first_name: firstName,
+                last_name: lastName,
+                phone_number: phoneNumber,
+                password: password,
+                confirm_password: confirmPassword,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            // Handle successful registration
+            if (response.status === 201) {
+                // Redirect to login page
+                window.location.href = '/login';
+            }
+        } catch (error) {
+            console.error(error);
+            // Handle registration error
+        }
+    };
+
 
     return (
         <Container
@@ -45,6 +77,7 @@ const Register: React.FC = () => {
                 </Typography>
                 <Box
                     component="form"
+                    onSubmit={handleRegister}
                     sx={{
                         '& .MuiTextField-root': {
                             m: 1,
@@ -61,6 +94,8 @@ const Register: React.FC = () => {
                             required
                             id="filled-required-first-name"
                             label="First Name"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
                         />
                     </Box>
                     <Box>
@@ -69,23 +104,29 @@ const Register: React.FC = () => {
                             required
                             id="filled-required-last-name"
                             label="Last Name"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
                         />
                     </Box>
                     <Box>
                         <TextField
                             variant="outlined"
                             required
-                            id="filled-required-email"
-                            label="Email"
-                            type="email"
+                            id="filled-required-phone-number"
+                            label="Phone Number"
+                            type="tel"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
                         />
                     </Box>
                     <Box>
-                        <FormControl sx={{ m: 1, width: { xs: '100%', sm: '50ch' } }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: { xs: '100%', sm: '50ch' } }} required variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"
                                 type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 endAdornment={
                                     <InputAdornment position="end">
                                         <IconButton
@@ -103,11 +144,13 @@ const Register: React.FC = () => {
                         </FormControl>
                     </Box>
                     <Box>
-                        <FormControl sx={{ m: 1, width: { xs: '100%', sm: '50ch' } }} variant="outlined">
+                        <FormControl sx={{ m: 1, width: { xs: '100%', sm: '50ch' } }} required variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-confirm-password">Confirm Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-confirm-password"
                                 type={showConfirmPassword ? 'text' : 'password'}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                                 endAdornment={
                                     <InputAdornment position="end">
                                         <IconButton

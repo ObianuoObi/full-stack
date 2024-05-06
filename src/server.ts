@@ -6,14 +6,39 @@ import express, {
 } from "express"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import bcrypt from "bcryptjs"
-import { getUsers, saveUserToDatabase, getUserByUsername } from "./database" // Import getUsers function
+import {
+	getUsers,
+	saveUserToDatabase,
+	getUserByPhoneNumber,
+	updateUserDetails,
+	depositMoney,
+	withdrawMoney,
+} from "./database"
 import { invest, withdraw, pairUsers } from "./businessLogic"
 import Joi from "joi"
 import https from "https"
 import fs from "fs"
 import rateLimit from "express-rate-limit"
+import cors from "cors"
 
 dotenv.config()
+
+function authenticateToken(req: Request, res: Response, next: NextFunction) {
+	const authHeader = req.headers["authorization"]
+	const token = authHeader && authHeader.split(" ")[1]
+
+	if (token == null) return res.sendStatus(401) // if there isn't any token
+
+	jwt.verify(
+		token,
+		process.env.ACCESS_TOKEN_SECRET as string,
+		(err: any, user: any) => {
+			if (err) return res.sendStatus(403)
+			req.user = user
+			next() // pass the execution off to whatever request the client intended
+		}
+	)
+}
 
 if (!process.env.ACCESS_TOKEN_SECRET) {
 	console.error(
@@ -30,19 +55,21 @@ const limiter = rateLimit({
 const app = express()
 app.use(express.json())
 app.use(limiter)
+app.use(cors())
 
 const options = {
-	key: fs.readFileSync("path/to/private-key.pem"), // REVISIT
-	cert: fs.readFileSync("path/to/public-certificate.pem"), // REVISIT
+	key: fs.readFileSync("certs/private-key.pem"), // REVISIT
+	cert: fs.readFileSync("certs/public-certificate.pem"), // REVISIT
 }
 
-https.createServer(options, app).listen(3000, () => {
-	console.log("HTTPS server running on port 3000")
+https.createServer(options, app).listen(3001, () => {
+	console.log("HTTPS server running on port 3001")
 })
 
 export interface User {
-	username: string
-	email: string
+	first_name: string
+	last_name: string
+	phone_number: string
 	password: string
 	isAdmin: boolean
 }
@@ -54,10 +81,11 @@ interface Request extends ExpressRequest {
 let users: User[] = []
 
 const userSchema = Joi.object({
-	username: Joi.string().alphanum().min(3).max(30).required(),
-	email: Joi.string().email().required(),
+	first_name: Joi.string().min(3).max(30).required(),
+	last_name: Joi.string().min(3).max(30).required(),
+	phone_number: Joi.string().required(),
 	password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
-	isAdmin: Joi.boolean(),
+	confirm_password: Joi.ref("password"),
 })
 
 app.post("/register", async (req: Request, res: Response) => {
@@ -67,8 +95,9 @@ app.post("/register", async (req: Request, res: Response) => {
 	try {
 		const hashedPassword = await bcrypt.hash(req.body.password, 12)
 		const user: User = {
-			username: req.body.username,
-			email: req.body.email,
+			first_name: req.body.first_name,
+			last_name: req.body.last_name,
+			phone_number: req.body.phone_number,
 			password: hashedPassword,
 			isAdmin: false, // new users are not admins by default
 		}
@@ -98,8 +127,9 @@ app.post("/users", async (req: Request, res: Response) => {
 	try {
 		const hashedPassword = await bcrypt.hash(req.body.password, 10)
 		const user: User = {
-			username: req.body.username,
-			email: req.body.email,
+			first_name: req.body.first_name,
+			last_name: req.body.last_name,
+			phone_number: req.body.phone_number,
 			password: hashedPassword,
 			isAdmin: false,
 		}
@@ -113,29 +143,38 @@ app.post("/users", async (req: Request, res: Response) => {
 })
 
 const loginSchema = Joi.object({
-	username: Joi.string().alphanum().min(3).max(30).required(),
+	phone_number: Joi.string().required(),
 	password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
 })
 
 app.post("/login", async (req: Request, res: Response) => {
-	const { error } = loginSchema.validate(req.body)
-	if (error) return res.status(400).send(error.details[0].message)
+	console.log("Received login request with data:", req.body) // Log the request data
 
-	const user = await getUserByUsername(req.body.username)
+	const { error } = loginSchema.validate(req.body)
+	if (error) {
+		console.error(error.details)
+		return res.status(400).send(error.details[0].message)
+	}
+
+	console.log("Phone number from request:", req.body.phone_number) // Log the phone number from the request
+
+	const user = await getUserByPhoneNumber(req.body.phone_number)
+
+	console.log("User from database:", user) // Log the user from the database
 
 	if (user == null) {
-		return res.status(400).send("Invalid username or password")
+		return res.status(400).send("Invalid phone number or password")
 	}
 
 	try {
 		if (await bcrypt.compare(req.body.password, user.password)) {
 			const accessToken = jwt.sign(
-				{ username: user.username, authMethod: "login" },
+				{ phone_number: user.phone_number, authMethod: "login" },
 				process.env.ACCESS_TOKEN_SECRET!
 			)
 			res.json({ accessToken: accessToken })
 		} else {
-			res.send("Invalid username or password")
+			res.send("Invalid phone number or password")
 		}
 	} catch (error) {
 		console.error(error) // Log the error for your own debugging
@@ -143,141 +182,66 @@ app.post("/login", async (req: Request, res: Response) => {
 	}
 })
 
-app.post("/refresh-token", async (req: Request, res: Response) => {
-	// Assume refreshToken is sent as a Bearer token in the Authorization header
-	const authHeader = req.headers["authorization"]
-	const refreshToken = authHeader && authHeader.split(" ")[1]
-
-	if (!refreshToken) {
-		return res.sendStatus(401) // Unauthorized
-	}
-
-	// Verify the refresh token
-	let userData
-	try {
-		userData = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!)
-	} catch (err) {
-		return res.sendStatus(403) // Forbidden
-	}
-
-	if (
-		typeof userData === "string" ||
-		!req.user ||
-		typeof req.user === "string"
-	) {
-		return res.sendStatus(401) // Unauthorized
-	}
-
-	// Generate a new access token
-	const accessToken = jwt.sign(
-		{ username: userData.username, authMethod: "refreshToken" },
-		process.env.ACCESS_TOKEN_SECRET!
-	)
-
-	res.json({ accessToken: accessToken })
-})
-
-function authenticateToken(req: Request, res: Response, next: NextFunction) {
-	const authHeader = req.headers["authorization"]
-	const token = authHeader && authHeader.split(" ")[1]
-	if (token == null) return res.sendStatus(401)
-
-	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, user) => {
-		if (err) return res.sendStatus(403)
-		req.user = user
-		next()
-	})
-}
-
 app.post(
-	"/sensitive-operation",
+	"/updateAccountDetails",
 	authenticateToken,
 	async (req: Request, res: Response) => {
+		const { first_name, last_name, account_number } = req.body
 		if (!req.user || typeof req.user === "string") {
-			return res.status(401).send("Unauthorized")
+			return res.status(401).send({ message: "Unauthorized" })
 		}
-
-		if ((req.user as JwtPayload).authMethod === "refreshToken") {
-			return res
-				.status(401)
-				.send("Please log in again to perform this operation")
+		try {
+			await updateUserDetails(
+				first_name,
+				last_name,
+				account_number,
+				req.user.phone_number
+			)
+			res.status(200).send()
+		} catch (error) {
+			console.error(error)
+			res.status(500).send({ message: "Error updating account details" })
 		}
-
-		// Perform the sensitive operation
-		// This is just a placeholder. Replace with your actual operation.
-		res.send("Sensitive operation performed successfully")
 	}
 )
-const investSchema = Joi.object({
-	amount: Joi.number().positive().required(),
-})
 
-app.post("/invest", authenticateToken, async (req: Request, res: Response) => {
-	const { error } = investSchema.validate(req.body)
-	if (error) return res.status(400).send(error.details[0].message)
-
+app.post("/deposit", authenticateToken, async (req: Request, res: Response) => {
+	const { deposit } = req.body
+	if (!req.user || typeof req.user === "string") {
+		return res.status(401).send({ message: "Unauthorized" })
+	}
 	try {
-		if (!req.user || typeof req.user === "string") {
-			return res.status(401).send("Unauthorized")
-		}
-
-		const newBalance = await invest(req.user.id, req.body.amount)
-		res.json({ newBalance: newBalance })
+		await depositMoney(deposit, req.user.phone_number)
+		res.status(200).send()
 	} catch (error) {
 		console.error(error)
-		res.status(500).send("An error occurred while making an investment.")
+		res.status(500).send({ message: "Error depositing money" })
 	}
-})
-
-const withdrawSchema = Joi.object({
-	amount: Joi.number().positive().required(),
 })
 
 app.post(
 	"/withdraw",
 	authenticateToken,
 	async (req: Request, res: Response) => {
-		const { error } = withdrawSchema.validate(req.body)
-		if (error) return res.status(400).send(error.details[0].message)
-
+		const { withdraw } = req.body
+		if (!req.user || typeof req.user === "string") {
+			return res.status(401).send({ message: "Unauthorized" })
+		}
 		try {
-			// Check if the user is authenticated
-			if (!req.user || typeof req.user === "string") {
-				return res.status(401).send("Unauthorized")
-			}
-
-			const newBalance = await withdraw(req.user.id, req.body.amount)
-			res.json({ newBalance: newBalance })
+			await withdrawMoney(withdraw, req.user.phone_number)
+			res.status(200).send()
 		} catch (error) {
 			console.error(error)
-			res.status(500).send("An error occurred while requesting a withdrawal.")
+			res.status(500).send({ message: "Error withdrawing money" })
 		}
 	}
 )
 
-const pairSchema = Joi.object({
-	userId: Joi.string().required(),
-	payerIds: Joi.array().items(Joi.string()).required(),
+app.listen(3002, () => {
+	console.log(`Server is running on http://localhost:3002`)
 })
-
-app.post("/pair", authenticateToken, async (req: Request, res: Response) => {
-	const { error } = pairSchema.validate(req.body)
-	if (error) return res.status(400).send(error.details[0].message)
-
-	// Check if the user is authenticated and is an admin
-	if (!req.user || typeof req.user === "string" || !req.user.isAdmin) {
-		return res.status(403).send("Forbidden")
-	}
-
-	try {
-		await pairUsers(req.body.userId, req.body.payerIds)
-		res.send("Pairing successful")
-	} catch (error) {
-		console.error(error)
-		res.status(500).send("An error occurred while pairing users.")
-	}
-})
-
-app.listen(3000, () => {
-	console.log(`Server is running on http://localhost:3000`)
-})
+app.use(
+	cors({
+		origin: "http://localhost:3000",
+	})
+)

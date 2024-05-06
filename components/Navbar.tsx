@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
         { name: 'Home' },
         { name: 'Login', },
         { name: 'Register', },
-        { name: 'Withdraw', },
+        { name: 'Dashboard', },
     ];
     const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
                     component="div"
                     sx={{ flexGrow: 1, display: { xs: 'block', sm: 'block' } }}
                 >
-                    MUI
+                    LoanPay
                 </Typography>
                 <Box sx={{ display: { xs: 'none', sm: 'block', } }}>
                     {navItems.map((item) => (
