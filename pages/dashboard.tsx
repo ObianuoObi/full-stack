@@ -1,20 +1,13 @@
-import { Box, Button, FormControl, InputLabel, OutlinedInput, TextField } from '@mui/material';
+import { Box, Button, TextField, Tab, Tabs } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Dashboard: React.FC = () => {
+const DashboardContent: React.FC = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [accountNumber, setAccountNumber] = useState('');
     const [deposit, setDeposit] = useState(0);
     const [withdraw, setWithdraw] = useState(0);
-
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = '/login';
-        }
-    }, []);
 
     const handleUpdateAccountDetails = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -41,20 +34,8 @@ const Dashboard: React.FC = () => {
     };
 
     return (
-        <Box
-            component="form"
-            onSubmit={handleUpdateAccountDetails}
-            sx={{
-                '& .MuiTextField-root': {
-                    m: 1,
-                    width: { xs: '100%', sm: '50ch' } // 90% width on small screens, 50ch on larger screens
-                },
-            }}
-            noValidate
-            autoComplete="off"
-        >
-            <h1>Dashboard</h1>
-            <Button type="submit">Update Account Details</Button>
+        <>
+            <Button type="submit" onClick={handleUpdateAccountDetails}>Update Account Details</Button>
             <TextField
                 variant="outlined"
                 required
@@ -79,7 +60,6 @@ const Dashboard: React.FC = () => {
                 value={accountNumber}
                 onChange={(e) => setAccountNumber(e.target.value)}
             />
-
             <TextField
                 variant="outlined"
                 required
@@ -98,11 +78,53 @@ const Dashboard: React.FC = () => {
                 onChange={(e) => setWithdraw(Number(e.target.value))}
             />
             <Button type="submit" onClick={handleWithdraw}>Withdraw</Button>
+        </>
+    );
+}
+
+const ProfileContent: React.FC = () => {
+    return (
+        <>
+            {/* Profile content goes here */}
+        </>
+    );
+}
+
+const Dashboard: React.FC = () => {
+    const [tabValue, setTabValue] = useState(0);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login';
+        }
+    }, []);
+
+    const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+        setTabValue(newValue);
+    };
+
+    return (
+        <Box
+            component="form"
+            sx={{
+                '& .MuiTextField-root': {
+                    m: 1,
+                    width: { xs: '100%', sm: '50ch' } // 90% width on small screens, 50ch on larger screens
+                },
+            }}
+            noValidate
+            autoComplete="off"
+        >
+            <h1>Dashboard</h1>
+            <Tabs value={tabValue} onChange={handleTabChange}>
+                <Tab label="Dashboard" />
+                <Tab label="Profile" />
+            </Tabs>
+            {tabValue === 0 && <DashboardContent />}
+            {tabValue === 1 && <ProfileContent />}
         </Box>
     );
 }
 
 export default Dashboard;
-
-
-
