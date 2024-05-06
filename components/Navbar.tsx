@@ -10,7 +10,6 @@ const Navbar: React.FC = () => {
         { name: 'Home' },
         { name: 'Login', },
         { name: 'Register', },
-        { name: 'Dashboard', },
     ];
     const [drawerOpen, setDrawerOpen] = useState(false);
 
