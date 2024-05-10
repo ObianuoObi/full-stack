@@ -237,6 +237,48 @@ app.post(
 	}
 )
 
+// Endpoint to get user details
+app.get(
+	"/getUserDetails",
+	authenticateToken,
+	async (req: Request, res: Response) => {
+		if (!req.user || typeof req.user === "string") {
+			return res.status(401).send({ message: "Unauthorized" })
+		}
+		try {
+			const user = await getUserByPhoneNumber(req.user.phone_number)
+			res.json(user)
+		} catch (error) {
+			console.error(error)
+			res.status(500).send({ message: "Error getting user details" })
+		}
+	}
+)
+
+// Endpoint to update user details
+app.post(
+	"/updateAccountDetails",
+	authenticateToken,
+	async (req: Request, res: Response) => {
+		const { first_name, last_name, account_number } = req.body
+		if (!req.user || typeof req.user === "string") {
+			return res.status(401).send({ message: "Unauthorized" })
+		}
+		try {
+			await updateUserDetails(
+				first_name,
+				last_name,
+				account_number,
+				req.user.phone_number
+			)
+			res.status(200).send()
+		} catch (error) {
+			console.error(error)
+			res.status(500).send({ message: "Error updating account details" })
+		}
+	}
+)
+
 app.listen(3002, () => {
 	console.log(`Server is running on http://localhost:3002`)
 })
