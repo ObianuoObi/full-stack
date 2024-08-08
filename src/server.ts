@@ -192,10 +192,8 @@ app.post(
 		}
 		try {
 			await updateUserDetails(
-				first_name,
-				last_name,
-				account_number,
-				req.user.phone_number
+				req.user.phone_number, // userId
+				{ first_name, last_name, account_number } // details
 			)
 			res.status(200).send()
 		} catch (error) {
@@ -266,10 +264,8 @@ app.post(
 		}
 		try {
 			await updateUserDetails(
-				first_name,
-				last_name,
-				account_number,
-				req.user.phone_number
+				req.user.phone_number, // userId
+				{ first_name, last_name, account_number } // details
 			)
 			res.status(200).send()
 		} catch (error) {
